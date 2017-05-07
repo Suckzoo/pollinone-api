@@ -6,9 +6,23 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "credential": {
+      "type": "string",
+      "required": true
+    },
+    "item": {
+      "type": "number"
+    }
+  },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "vote": {
+      "type": "belongsTo",
+      "model": "vote",
+      "foreignKey": "voteId"
+    }
+  },
   "acls": [
     {
       "accessType": "*",

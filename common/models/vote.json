@@ -1,13 +1,13 @@
 {
-  "name": "vote",
-  "plural": "vote",
+  "name": "Vote",
+  "plural": "Vote",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "code": {
+    "title": {
       "type": "string",
       "required": true
     },
@@ -15,13 +15,22 @@
       "type": "string",
       "required": true
     },
-    "root_credential": {
+    "rootCredential": {
       "type": "string",
       "required": true
     },
     "status": {
       "type": "string",
       "required": true
+    },
+    "itemCount": {
+      "type": "number",
+      "default": 2,
+      "required": true
+    },
+    "currentItem": {
+      "type": "number",
+      "default": 0
     }
   },
   "validations": [],
