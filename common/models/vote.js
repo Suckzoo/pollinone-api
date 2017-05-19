@@ -71,6 +71,38 @@ module.exports = function(Vote) {
     },
   });
 
+  Vote.fetchVoteByKey = (key, cb) => {
+    Vote.findOne({
+      where: {
+        key,
+        status: 'open',
+      },
+      fields: {
+        id: true,
+        title: true,
+        key: true,
+      }
+    }).then(vote => {
+      cb(null, vote);
+    }).catch(err => {
+      cb(err);
+    });
+  };
+
+  Vote.remoteMethod('fetchVoteByKey', {
+    accepts: [{
+      arg: 'key',
+      type: 'string',
+    }],
+    returns: {
+      root: true
+    },
+    http: {
+      verb: 'get',
+      path: '/fetch/:key',
+    }
+  });
+
   Vote.join = (id, key, cb) => {
     Vote.findOne({
       where: {
