@@ -40,7 +40,7 @@ module.exports = function(Vote) {
 
   Vote.start = (id, rootCredential, cb) => {
     _findVoteAsRoot(id, rootCredential).then(vote => {
-      if (vote.status !== 'init') {
+      if (vote.status !== 'open') {
         throw 'already started vote';
       }
       vote.status = 'voting';
