@@ -5,9 +5,11 @@ const moment = require('moment');
 module.exports = function(Vote) {
   Vote.createVote = (title, itemCount, cb) => {
     let key, rootCredential;
-    key = randomstring.generate(20);
+    key = randomstring.generate(2);
     rootCredential = randomstring.generate(10);
-    title = title || `Vote created at ${moment().format('YYYY-MM-DD HH:mm')}`;
+    let now = moment();
+    title = title || `Vote created at ${now().format('YYYY-MM-DD HH:mm')}`;
+    let validTimestamp = now.add(5, 'minute').toDate();
     itemCount = itemCount || 2;
     return Vote.create({
       title,
@@ -15,6 +17,7 @@ module.exports = function(Vote) {
       key,
       rootCredential,
       status: 'open',
+      validTimestamp
     }).then(vote => {
       cb(null, vote);
     }).catch(err => {
@@ -115,6 +118,10 @@ module.exports = function(Vote) {
       }
       if (vote.status !== 'init') {
         throw 'user is not allowed to join this vote';
+      }
+      let validTimestamp = moment(vote.validTimestamp);
+      if (validTimestamp < moment()) {
+        throw 'vote validity expired';
       }
       return Vote.app.models.Member.create({
         credential: randomstring.generate(20),

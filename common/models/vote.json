@@ -31,6 +31,10 @@
     "currentItem": {
       "type": "number",
       "default": 0
+    },
+    "validTimestamp": {
+      "type": "date",
+      "required": true
     }
   },
   "validations": [],
