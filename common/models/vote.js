@@ -75,10 +75,14 @@ module.exports = function(Vote) {
   });
 
   Vote.fetchVoteByKey = (key, cb) => {
+    let now = new Date();
     Vote.findOne({
       where: {
         key,
         status: 'open',
+        validTimestamp: {
+          gt: now
+        }
       },
       fields: {
         id: true,
@@ -116,7 +120,7 @@ module.exports = function(Vote) {
       if (!vote) {
         throw 'no vote room available';
       }
-      if (vote.status !== 'init') {
+      if (vote.status !== 'open') {
         throw 'user is not allowed to join this vote';
       }
       let validTimestamp = moment(vote.validTimestamp);
@@ -195,13 +199,12 @@ module.exports = function(Vote) {
       }
       return Promise.all(Array.from(Array(vote.itemCount).keys()).map(item => (
         Vote.app.models.Member.count({
-          where: {
-            voteId: id,
-            item: item,
-          },
+          voteId: id,
+          item: item,
         }))
       ));
     }).then(_result => {
+      console.log(_result);
       result = _result;
       vote.status = 'closed';
       return Vote.upsert(vote);
@@ -228,6 +231,33 @@ module.exports = function(Vote) {
     http: {
       verb: 'get',
       path: '/close/:id',
+    },
+  });
+
+  Vote.isStarted = (id, cb) => {
+    Vote.findById(id, {
+      fields: {
+        status: true
+      }
+    }).then(_vote => {
+      cb(null, _vote.status === 'voting');
+    }).catch(err => {
+      cb(err);
+    });
+  }
+
+  Vote.remoteMethod('isStarted', {
+    accepts: [{
+      arg: 'id',
+      type: 'number',
+      required: true,
+    }],
+    returns: {
+      root: true,
+    },
+    http: {
+      verb: 'get',
+      path: '/isStarted/:id',
     },
   });
 

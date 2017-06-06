@@ -1,7 +1,7 @@
 const app = require('../server/server');
 const datasource = app.datasources['db'];
 
-const models = ['ACL', 'Vote', 'Member'];
+const models = ['Member'];
 function autoUpdate() {
   datasource.autoupdate(models, err => {
     if (err) {

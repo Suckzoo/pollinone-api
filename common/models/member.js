@@ -2,23 +2,10 @@
 
 module.exports = function(Member) {
   Member.vote = (id, credential, cb) => {
-    Member.findOne({
-      where: {
-        voteId: id,
-        credential,
-      },
-      include: 'vote',
-    }).then(member => {
-      if (!member) {
-        throw 'invalid membership';
-      }
-      member = member.toJSON();
-      let vote = member.vote;
-      if (vote.status !== 'start') {
-        throw 'currently not voting';
-      }
-      let item = vote.currentItem;
+    _findMemberByCredential(id, credential).then(member => {
+      let item = member.vote.currentItem;
       member.item = item;
+      console.log(member)
       return Member.upsert(member);
     }).then(member => {
       cb(null, {
@@ -50,14 +37,9 @@ module.exports = function(Member) {
   });
 
   Member.withdraw = (id, credential, cb) => {
-    Member.findOne({
-      voteId: id,
-      credential,
-    }).then(member => {
-      if (!member) {
-        throw 'no membership found';
-      }
+    _findMemberByCredential(id, credential).then(member => {
       member.item = null;
+      console.log(member)
       return Member.upsert(member);
     }).then(() => {
       cb(null, {success: true});
@@ -84,4 +66,24 @@ module.exports = function(Member) {
       path: '/vote/:id',
     },
   })
+
+  function _findMemberByCredential(id, credential) {
+    return Member.findOne({
+      where: {
+        voteId: id,
+        credential,
+      },
+      include: 'vote'
+    }).then(member => {
+      if (!member) {
+        throw 'invalid membership';
+      }
+      member = member.toJSON();
+      let vote = member.vote;
+      if (vote.status !== 'voting') {
+        throw 'currently not voting';
+      }
+      return member;
+    });
+  }
 };

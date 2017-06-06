@@ -2,7 +2,8 @@
   "name": "Member",
   "plural": "Members",
   "base": "PersistedModel",
-  "idInjection": true,
+  "idInjection": false,
+  "forceId": false,
   "options": {
     "validateUpsert": true
   },
@@ -19,7 +20,7 @@
   "relations": {
     "vote": {
       "type": "belongsTo",
-      "model": "vote",
+      "model": "Vote",
       "foreignKey": "voteId"
     }
   },
