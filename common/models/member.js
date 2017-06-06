@@ -38,11 +38,16 @@ module.exports = function(Member) {
 
   Member.withdraw = (id, credential, cb) => {
     _findMemberByCredential(id, credential).then(member => {
-      member.item = null;
+      if (member.item === member.vote.currentItem) {
+        member.item = null;
+      }
       console.log(member)
       return Member.upsert(member);
-    }).then(() => {
-      cb(null, {success: true});
+    }).then(member => {
+      cb(null, {
+        item: member.item,
+        credential: member.credential,
+      });
     }).catch(err => {
       cb(err);
     });
