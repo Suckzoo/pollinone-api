@@ -73,7 +73,12 @@ module.exports = function(Member) {
         voteId: id,
         credential,
       },
-      include: 'vote'
+      include: {
+        relation: 'vote',
+        scope: {
+          fields: ['id', 'status', 'currentItem'],
+        }
+      }
     }).then(member => {
       if (!member) {
         throw 'invalid membership';
