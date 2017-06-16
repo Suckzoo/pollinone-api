@@ -74,6 +74,41 @@ module.exports = function(Vote) {
     },
   });
 
+  Vote.countVoter = (id, rootCredential, cb) => {
+    _findVoteAsRoot(id, rootCredential).then(vote => {
+      if (vote.status !== 'voting') {
+        throw 'currently not voting';
+      }
+      return Vote.app.models.Member.count({
+        voteId: id,
+        item: vote.currentItem
+      });
+    }).then(count => {
+      cb(null, count);
+    }).catch(err => {
+      cb(err);
+    });
+  };
+
+  Vote.remoteMethod('countVoter', {
+    accepts: [{
+      arg: 'id',
+      type: 'number',
+      required: true,
+    }, {
+      arg: 'rootCredential',
+      type: 'string',
+      required: true,
+    }],
+    returns: {
+      root: true
+    },
+    http: {
+      verb: 'get',
+      path: '/countVoter/:id',
+    },
+  });
+
   Vote.fetchVoteByKey = (key, cb) => {
     let now = new Date();
     Vote.findOne({
@@ -106,7 +141,47 @@ module.exports = function(Vote) {
     },
     http: {
       verb: 'get',
-      path: '/fetch/:key',
+      path: '/fetch',
+    }
+  });
+
+  Vote.fetchVoteById = (id, credential, cb) => {
+    Vote.app.models.Member.findOne({
+      where: {
+        voteId: id,
+        credential
+      },
+      include: {
+        relation: 'vote',
+        scope: {
+          fields: ['id', 'status', 'currentItem']
+        }
+      }
+    }).then(member => {
+      if (!member) {
+        throw 'invalid membership';
+      }
+      member = member.toJSON();
+      cb(null, member.vote);
+    }).catch(err => {
+      cb(err);
+    });
+  }
+
+  Vote.remoteMethod('fetchVoteById', {
+    accepts: [{
+      arg: 'id',
+      type: 'number',
+    }, {
+      arg: 'credential',
+      type: 'string',
+    }],
+    returns: {
+      root: true
+    },
+    http: {
+      verb: 'get',
+      path: '/fetch/:id',
     }
   });
 

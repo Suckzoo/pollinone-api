@@ -72,6 +72,13 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
+      "property": "fetchVoteById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
       "property": "join"
     },
     {
@@ -94,6 +101,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "isStarted"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission" :"ALLOW",
+      "property": "countVoter"
     }
   ],
   "methods": {}
